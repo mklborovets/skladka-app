@@ -11,6 +11,7 @@ import {
 } from '@shared/ui';
 import { GroupCard, GroupDoc, groupRepository } from '@entities/group';
 import { CreateGroupModal } from '@features/create-group';
+import { CreateInviteModal } from '@features/join-by-invite';
 import { useAuth } from '@app/providers';
 
 export interface GroupsListScreenProps {
@@ -27,6 +28,7 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [inviteTargetGroup, setInviteTargetGroup] = useState<GroupDoc | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -100,6 +102,7 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
               group={group}
               currentUserId={user.uid}
               onPress={() => onSelectGroup?.(group.id)}
+              onInvite={() => setInviteTargetGroup(group)}
             />
           ))}
         </View>
@@ -114,6 +117,16 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
           onSelectGroup?.(groupId);
         }}
       />
+
+      {inviteTargetGroup && (
+        <CreateInviteModal
+          visible={Boolean(inviteTargetGroup)}
+          groupId={inviteTargetGroup.id}
+          groupName={inviteTargetGroup.name}
+          creatorId={user.uid}
+          onClose={() => setInviteTargetGroup(null)}
+        />
+      )}
     </ScreenLayout>
   );
 };

@@ -14,6 +14,7 @@ export interface GroupCardProps {
   group: GroupDoc;
   currentUserId: string;
   onPress?: () => void;
+  onInvite?: () => void;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -21,6 +22,7 @@ export const GroupCard: React.FC<GroupCardProps> = ({
   group,
   currentUserId,
   onPress,
+  onInvite,
   style,
 }) => {
   const userBalance = group.balances[currentUserId] ?? 0;
@@ -59,8 +61,22 @@ export const GroupCard: React.FC<GroupCardProps> = ({
           </Text>
           <Text style={styles.members}>{memberText}</Text>
         </View>
-        <View style={styles.currencyBadge}>
-          <Text style={styles.currencyText}>{group.baseCurrency}</Text>
+        <View style={styles.rightHeader}>
+          {onInvite && (
+            <TouchableOpacity
+              onPress={e => {
+                e.stopPropagation?.();
+                onInvite();
+              }}
+              activeOpacity={0.7}
+              style={styles.inviteButton}
+            >
+              <Text style={styles.inviteButtonText}>+ Invite</Text>
+            </TouchableOpacity>
+          )}
+          <View style={styles.currencyBadge}>
+            <Text style={styles.currencyText}>{group.baseCurrency}</Text>
+          </View>
         </View>
       </View>
 
@@ -104,6 +120,22 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.textMuted,
     marginTop: 2,
+  },
+  rightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  inviteButton: {
+    backgroundColor: colors.primaryDark,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: radius.sm,
+  },
+  inviteButtonText: {
+    ...typography.label,
+    color: colors.primaryText,
+    fontSize: 11,
   },
   currencyBadge: {
     backgroundColor: colors.surface,
