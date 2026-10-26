@@ -13,3 +13,5 @@ android/.gradle/
 *.log
 .DS_Store
 Steps.md
+local.properties
+*.local.properties
