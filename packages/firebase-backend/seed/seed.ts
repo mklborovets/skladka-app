@@ -252,7 +252,7 @@ function toFirestoreFields(obj: Record<string, unknown>): Record<string, unknown
 export async function runSeed(): Promise<void> {
   const firestoreHost = process.env.FIRESTORE_EMULATOR_HOST || '127.0.0.1:8080';
   const authHost = process.env.FIREBASE_AUTH_EMULATOR_HOST || '127.0.0.1:9099';
-  const projectId = process.env.FIREBASE_PROJECT_ID || 'skladka-app';
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || 'demo-skladka';
 
   const { users, groups, expenses } = generateSeedData();
 
@@ -282,7 +282,10 @@ export async function runSeed(): Promise<void> {
     const url = `http://${firestoreHost}/v1/projects/${projectId}/databases/(default)/documents/groups/${group.id}`;
     const res = await fetch(url, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer owner',
+      },
       body: JSON.stringify({
         fields: toFirestoreFields(group as unknown as Record<string, unknown>),
       }),
@@ -309,7 +312,10 @@ export async function runSeed(): Promise<void> {
     const batchUrl = `http://${firestoreHost}/v1/projects/${projectId}/databases/(default)/documents:batchWrite`;
     const res = await fetch(batchUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer owner',
+      },
       body: JSON.stringify({ writes }),
     });
 
