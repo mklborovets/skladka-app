@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
-import { GroupDoc, groupRepository } from '@entities/group';
+import { GroupDoc, groupRepository, syncExpenseBalance } from '@entities/group';
 import { useAuth } from '@app/providers';
 import { ReceiptTooLargeError, processReceiptImage } from '@shared/lib/image';
 import { MemberListItem } from '../ui/MembersSplitList';
@@ -176,6 +176,8 @@ export const useCreateExpenseForm = (
             createdAt: Date.now(),
           });
       }
+
+      await syncExpenseBalance(groupId, expenseDocRef.id).catch(() => null);
 
       onSuccess?.(expenseDocRef.id);
       return expenseDocRef.id;
