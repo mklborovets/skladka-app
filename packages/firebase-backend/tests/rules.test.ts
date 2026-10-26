@@ -1,3 +1,4 @@
+import net from 'node:net';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { after, before, beforeEach, describe, it } from 'node:test';
@@ -5,8 +6,8 @@ import {
   assertFails,
   assertSucceeds,
   initializeTestEnvironment,
-  RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
+import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import {
   collection,
   deleteDoc,
@@ -17,23 +18,56 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 
-describe('Firestore Security Rules', () => {
-  let testEnv: RulesTestEnvironment;
-
-  before(async () => {
-    const rules = readFileSync(
-      resolve(process.cwd(), 'firestore.rules'),
-      'utf8'
-    );
-    testEnv = await initializeTestEnvironment({
-      projectId: 'demo-skladka-test',
-      firestore: {
-        host: process.env.FIRESTORE_EMULATOR_HOST?.split(':')[0] || '127.0.0.1',
-        port: Number(process.env.FIRESTORE_EMULATOR_HOST?.split(':')[1]) || 8080,
-        rules,
-      },
+function isEmulatorReachable(host: string, port: number): Promise<boolean> {
+  return new Promise(resolve => {
+    const socket = new net.Socket();
+    socket.setTimeout(250);
+    socket.on('connect', () => {
+      socket.destroy();
+      resolve(true);
     });
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.on('error', () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.connect(port, host);
   });
+}
+
+const emulatorHost =
+  process.env.FIRESTORE_EMULATOR_HOST?.split(':')[0] || '127.0.0.1';
+const emulatorPort =
+  Number(process.env.FIRESTORE_EMULATOR_HOST?.split(':')[1]) || 8080;
+const emulatorReady = await isEmulatorReachable(emulatorHost, emulatorPort);
+
+describe(
+  'Firestore Security Rules',
+  {
+    skip:
+      !emulatorReady &&
+      `Firestore emulator not running on ${emulatorHost}:${emulatorPort}`,
+  },
+  () => {
+    let testEnv: RulesTestEnvironment;
+
+    before(async () => {
+      const rules = readFileSync(
+        resolve(process.cwd(), 'firestore.rules'),
+        'utf8'
+      );
+      testEnv = await initializeTestEnvironment({
+        projectId: 'demo-skladka-test',
+        firestore: {
+          host: emulatorHost,
+          port: emulatorPort,
+          rules,
+        },
+      });
+    });
 
   beforeEach(async () => {
     await testEnv.clearFirestore();
