@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import { GroupDoc, groupRepository, syncExpenseBalance } from '@entities/group';
 import { useAuth } from '@app/providers';
+import { exchangeRateService } from '@shared/lib/currency';
 import { ReceiptTooLargeError, processReceiptImage } from '@shared/lib/image';
 import { MemberListItem } from '../ui/MembersSplitList';
 import { SplitType, computeSplits } from './splitCalculator';
@@ -19,6 +20,8 @@ export interface UseCreateExpenseFormReturn {
   formState: CreateExpenseFormState;
   splitPreview: MemberListItem[];
   totalAmountMinor: number;
+  baseAmountMinor: number;
+  exchangeRateToBase: number;
   isSubmitting: boolean;
   isCompressingReceipt: boolean;
   error: string | null;
@@ -44,6 +47,7 @@ export const useCreateExpenseForm = (
   const [splitType, setSplitType] = useState<SplitType>('EQUAL');
   const [memberValues, setMemberValues] = useState<Record<string, number>>({});
   const [receiptBase64, setReceiptBase64] = useState<string | null>(null);
+  const [exchangeRateToBase, setExchangeRateToBase] = useState<number>(1.0);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isCompressingReceipt, setIsCompressingReceipt] = useState<boolean>(false);
@@ -67,12 +71,35 @@ export const useCreateExpenseForm = (
     };
   }, [groupId]);
 
+  useEffect(() => {
+    let isMounted = true;
+    if (!group) return;
+
+    if (currency === group.baseCurrency) {
+      setExchangeRateToBase(1.0);
+      return;
+    }
+
+    exchangeRateService
+      .getExchangeRate(currency, group.baseCurrency)
+      .then(result => {
+        if (isMounted) {
+          setExchangeRateToBase(result.rate);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currency, group]);
+
   const totalAmountMinor = Math.round((parseFloat(amountInput) || 0) * 100);
+  const baseAmountMinor = Math.round(totalAmountMinor * exchangeRateToBase);
 
   const memberIds = group ? group.memberIds : [];
   const { splits, isValid, errorMessage } = computeSplits(
     splitType,
-    totalAmountMinor,
+    baseAmountMinor,
     memberIds,
     memberValues
   );
@@ -151,8 +178,8 @@ export const useCreateExpenseForm = (
         paidBy: user.uid,
         amount: totalAmountMinor,
         currency,
-        exchangeRateToBase: 1.0,
-        baseAmount: totalAmountMinor,
+        exchangeRateToBase,
+        baseAmount: baseAmountMinor,
         splitType,
         splits,
         hasReceipt: Boolean(receiptBase64),
@@ -202,6 +229,8 @@ export const useCreateExpenseForm = (
     },
     splitPreview,
     totalAmountMinor,
+    baseAmountMinor,
+    exchangeRateToBase,
     isSubmitting,
     isCompressingReceipt,
     error,
