@@ -1,5 +1,8 @@
 {
   "name": "@skladka/firebase-backend",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "emulators": "firebase emulators:start --config firebase.json"
+  }
 }
