@@ -11,5 +11,10 @@
     "android": "npm --prefix apps/mobile run android",
     "emulators": "npm --prefix packages/firebase-backend run emulators",
     "seed": "npm --prefix packages/firebase-backend run seed"
+  },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "5.9.6"
+    }
   }
 }
