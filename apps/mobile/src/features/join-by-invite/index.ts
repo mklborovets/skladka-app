@@ -1,3 +1,4 @@
 export * from './model/useInvitePreview';
+export * from './model/useCreateInvite';
 export * from './ui/InviteModal';
 export * from './ui/CreateInviteModal';

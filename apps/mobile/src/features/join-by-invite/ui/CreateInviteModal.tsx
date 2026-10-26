@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   Modal,
-  Share,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { Button, ErrorBanner, colors, radius, spacing, typography } from '@shared/ui';
-import { InviteDoc, inviteRepository } from '@entities/invite';
+import { useCreateInvite } from '../model/useCreateInvite';
 
 export interface CreateInviteModalProps {
   visible: boolean;
@@ -25,49 +24,17 @@ export const CreateInviteModal: React.FC<CreateInviteModalProps> = ({
   groupName,
   onClose,
 }) => {
-  const [invite, setInvite] = useState<InviteDoc | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleGenerate = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const created = await inviteRepository.createInvite({
-        groupId,
-        createdBy: creatorId,
-        expiresInDays: 7,
-      });
-      setInvite(created);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to create invite';
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleShare = async () => {
-    if (!invite) {
-      return;
-    }
-    const deepLink = `skladka://invite/${invite.token}`;
-    const message = groupName
-      ? `Join "${groupName}" on SKLADKA to split shared expenses: ${deepLink}`
-      : `Join our group on SKLADKA to split shared expenses: ${deepLink}`;
-
-    try {
-      await Share.share({
-        message,
-        url: deepLink,
-      });
-    } catch {}
-  };
+  const {
+    invite,
+    isLoading,
+    error,
+    generateInvite,
+    shareInvite,
+    reset,
+  } = useCreateInvite(groupId, creatorId, groupName);
 
   const handleClose = () => {
-    setInvite(null);
-    setError(null);
+    reset();
     onClose();
   };
 
@@ -98,7 +65,7 @@ export const CreateInviteModal: React.FC<CreateInviteModalProps> = ({
 
               <Button
                 title="Share Link"
-                onPress={handleShare}
+                onPress={shareInvite}
                 variant="primary"
                 size="md"
                 style={styles.actionButton}
@@ -121,7 +88,7 @@ export const CreateInviteModal: React.FC<CreateInviteModalProps> = ({
               ) : (
                 <Button
                   title="Generate Invite Link"
-                  onPress={handleGenerate}
+                  onPress={generateInvite}
                   variant="primary"
                   size="md"
                   style={styles.actionButton}

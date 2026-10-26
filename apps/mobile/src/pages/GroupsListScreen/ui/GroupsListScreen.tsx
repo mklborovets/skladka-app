@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import {
   AppHeader,
@@ -9,7 +9,7 @@ import {
   colors,
   spacing,
 } from '@shared/ui';
-import { GroupCard, GroupDoc, groupRepository } from '@entities/group';
+import { GroupCard, GroupDoc, useUserGroups } from '@entities/group';
 import { CreateGroupModal } from '@features/create-group';
 import { CreateInviteModal } from '@features/join-by-invite';
 import { useAuth } from '@app/providers';
@@ -24,32 +24,9 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
   onOpenProfile,
 }) => {
   const { user } = useAuth();
-  const [groups, setGroups] = useState<GroupDoc[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { groups, isLoading, error } = useUserGroups(user?.uid);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [inviteTargetGroup, setInviteTargetGroup] = useState<GroupDoc | null>(null);
-
-  useEffect(() => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-
-    const unsubscribe = groupRepository.subscribeToUserGroups(
-      user.uid,
-      loadedGroups => {
-        setGroups(loadedGroups);
-        setIsLoading(false);
-      },
-      err => {
-        setError(err.message);
-        setIsLoading(false);
-      }
-    );
-
-    return unsubscribe;
-  }, [user]);
 
   if (!user) {
     return null;
