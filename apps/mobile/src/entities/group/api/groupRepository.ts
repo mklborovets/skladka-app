@@ -29,6 +29,36 @@ export const groupRepository = {
       );
   },
 
+  subscribeToGroup(
+    groupId: string,
+    onUpdate: (group: GroupDoc | null) => void,
+    onError: (error: Error) => void
+  ): () => void {
+    return firestore()
+      .collection('groups')
+      .doc(groupId)
+      .onSnapshot(
+        snapshot => {
+          if (!snapshot.exists) {
+            onUpdate(null);
+            return;
+          }
+          const data = snapshot.data();
+          if (!data) {
+            onUpdate(null);
+            return;
+          }
+          onUpdate({
+            id: snapshot.id,
+            ...(data as Omit<GroupDoc, 'id'>),
+          });
+        },
+        error => {
+          onError(error);
+        }
+      );
+  },
+
   async getGroupById(groupId: string): Promise<GroupDoc | null> {
     const doc = await firestore().collection('groups').doc(groupId).get();
     if (!doc.exists) {

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '@app/navigation/types';
 import {
   AppHeader,
   Button,
@@ -23,14 +26,26 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
   onSelectGroup,
   onOpenProfile,
 }) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { user } = useAuth();
   const { groups, isLoading, error } = useUserGroups(user?.uid);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [inviteTargetGroup, setInviteTargetGroup] = useState<GroupDoc | null>(null);
+  const [inviteTargetGroup, setInviteTargetGroup] = useState<GroupDoc | null>(
+    null
+  );
 
   if (!user) {
     return null;
   }
+
+  const handleSelectGroup = (groupId: string) => {
+    if (onSelectGroup) {
+      onSelectGroup(groupId);
+    } else {
+      navigation.navigate('GroupDetails', { groupId });
+    }
+  };
 
   return (
     <ScreenLayout scrollable>
@@ -78,7 +93,7 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
               key={group.id}
               group={group}
               currentUserId={user.uid}
-              onPress={() => onSelectGroup?.(group.id)}
+              onPress={() => handleSelectGroup(group.id)}
               onInvite={() => setInviteTargetGroup(group)}
             />
           ))}
@@ -91,7 +106,7 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
         onClose={() => setIsModalVisible(false)}
         onSuccess={groupId => {
           setIsModalVisible(false);
-          onSelectGroup?.(groupId);
+          handleSelectGroup(groupId);
         }}
       />
 

@@ -2,7 +2,13 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '@app/providers';
-import { AuthScreen, GroupsListScreen, InvitePreviewScreen } from '@pages';
+import {
+  AuthScreen,
+  CreateExpenseScreen,
+  GroupDetailsScreen,
+  GroupsListScreen,
+  InvitePreviewScreen,
+} from '@pages';
 import { colors } from '@shared/ui';
 import { linking } from './linking';
 import { RootStackParamList } from './types';
@@ -45,6 +51,8 @@ export const RootNavigator: React.FC = () => {
         ) : (
           <>
             <Stack.Screen name="GroupsList" component={GroupsListScreen} />
+            <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
+            <Stack.Screen name="CreateExpense" component={CreateExpenseScreen} />
             <Stack.Screen
               name="InvitePreview"
               component={InvitePreviewScreen}
