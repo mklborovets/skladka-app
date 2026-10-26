@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from './providers';
 import { RootNavigator } from './navigation';
+import { startBackgroundExpenseListener } from './headless/backgroundListener';
 import { colors } from '@shared/ui';
 import {
   OfflineQueueBanner,
@@ -13,6 +14,18 @@ const OfflineSyncCoordinator: React.FC = () => {
   const { user } = useAuth();
   const { isOnline, isSyncing, pendingCount, processQueue } =
     useOfflineMutationQueue(user?.uid);
+
+  useEffect(() => {
+    let cleanup: (() => void) | undefined;
+    if (user) {
+      startBackgroundExpenseListener().then(unsub => {
+        cleanup = unsub;
+      });
+    }
+    return () => {
+      cleanup?.();
+    };
+  }, [user]);
 
   return (
     <>
