@@ -13,6 +13,7 @@ export const expenseRepository = {
       .collection('expenses')
       .orderBy('createdAt', 'desc')
       .onSnapshot(
+        { includeMetadataChanges: true },
         snapshot => {
           const items: ExpenseDoc[] = snapshot.docs.map(doc => {
             const data = doc.data();

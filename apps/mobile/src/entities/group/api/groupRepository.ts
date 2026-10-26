@@ -11,6 +11,7 @@ export const groupRepository = {
       .collection('groups')
       .where('memberIds', 'array-contains', userId)
       .onSnapshot(
+        { includeMetadataChanges: true },
         snapshot => {
           if (!snapshot) {
             onUpdate([]);
@@ -38,6 +39,7 @@ export const groupRepository = {
       .collection('groups')
       .doc(groupId)
       .onSnapshot(
+        { includeMetadataChanges: true },
         snapshot => {
           if (!snapshot.exists) {
             onUpdate(null);
