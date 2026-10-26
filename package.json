@@ -10,7 +10,9 @@
     "start": "npm --prefix apps/mobile start",
     "android": "npm --prefix apps/mobile run android",
     "emulators": "npm --prefix packages/firebase-backend run emulators",
-    "seed": "npm --prefix packages/firebase-backend run seed"
+    "seed": "npm --prefix packages/firebase-backend run seed",
+    "test": "npm --prefix packages/firebase-backend test",
+    "typecheck": "npm --prefix apps/mobile run typecheck && npm --prefix packages/firebase-backend run typecheck"
   },
   "overrides": {
     "jwks-rsa": {
