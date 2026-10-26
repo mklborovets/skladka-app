@@ -1,3 +1,4 @@
+
 # SKLADKA
 
 SKLADKA is a serverless, offline-first group expense splitting mobile application built with React Native CLI and Firebase. It provides concurrent-safe balance calculations, offline mutation queuing, receipt compression, deep-link invitations, exchange rate fallback feeds, and greedy debt settlements.
