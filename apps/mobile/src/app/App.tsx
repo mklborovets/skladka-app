@@ -1,24 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AuthProvider } from './providers';
+import { AuthScreen } from '@pages/AuthScreen';
+import { colors } from '@shared/ui';
 
 export const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>SKLADKA</Text>
-    </View>
+    <SafeAreaProvider>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={colors.background}
+      />
+      <AuthProvider>
+        <AuthScreen />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#0F172A',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#F8FAFC',
-  },
-});

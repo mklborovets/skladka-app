@@ -6,6 +6,7 @@ export interface EnvironmentConfig {
   AUTH_EMULATOR_PORT: number;
   FIRESTORE_EMULATOR_PORT: number;
   FUNCTIONS_EMULATOR_PORT: number;
+  GOOGLE_WEB_CLIENT_ID?: string;
 }
 
 const defaultEmulatorHost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
@@ -16,4 +17,5 @@ export const ENV: EnvironmentConfig = {
   AUTH_EMULATOR_PORT: 9099,
   FIRESTORE_EMULATOR_PORT: 8080,
   FUNCTIONS_EMULATOR_PORT: 5001,
+  GOOGLE_WEB_CLIENT_ID: undefined,
 };
