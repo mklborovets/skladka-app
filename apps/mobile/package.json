@@ -1,0 +1,43 @@
+{
+  "name": "@skladka/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@notifee/react-native": "^9.1.5",
+    "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-firebase/app": "^21.8.0",
+    "@react-native-firebase/auth": "^21.8.0",
+    "@react-native-firebase/firestore": "^21.8.0",
+    "@react-native-firebase/functions": "^21.8.0",
+    "@react-native-google-signin/google-signin": "^13.1.0",
+    "@react-navigation/native": "^7.0.14",
+    "@react-navigation/native-stack": "^7.2.0",
+    "react": "18.3.1",
+    "react-native": "0.76.5",
+    "react-native-image-picker": "^7.2.3",
+    "react-native-image-resizer": "^1.4.5",
+    "react-native-safe-area-context": "^5.1.0",
+    "react-native-screens": "3.35.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "15.0.1",
+    "@react-native-community/cli-platform-android": "15.0.1",
+    "@react-native-community/cli-platform-ios": "15.0.1",
+    "@react-native/babel-preset": "0.76.5",
+    "@react-native/metro-config": "0.76.5",
+    "@react-native/typescript-config": "0.76.5",
+    "@types/react": "^18.3.12",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "typescript": "^5.6.3"
+  }
+}

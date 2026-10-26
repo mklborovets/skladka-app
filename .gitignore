@@ -1,0 +1,15 @@
+node_modules/
+.gradle/
+build/
+android/app/build/
+android/.gradle/
+**/Pods/
+**/build/
+*.xcworkspace
+*.xcuserdata
+.xcode.env.local
+.idea/
+.vscode/
+*.log
+.DS_Store
+Steps.md

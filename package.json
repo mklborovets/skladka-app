@@ -1,0 +1,13 @@
+{
+  "name": "skladka",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "npm --prefix apps/mobile start",
+    "android": "npm --prefix apps/mobile run android"
+  }
+}
