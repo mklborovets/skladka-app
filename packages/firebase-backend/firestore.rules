@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isGroupMember(groupId) {
+      return isAuthenticated() &&
+        request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.memberIds;
+    }
+
+    function sumSplits(splitsMap) {
+      let v = splitsMap.values().concat([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      return v[0] + v[1] + v[2] + v[3] + v[4] + v[5] + v[6] + v[7] + v[8] + v[9];
+    }
+
+    function isValidSplitSum(splitsMap, totalAmount) {
+      return splitsMap.size() > 0
+        && splitsMap.size() <= 10
+        && totalAmount > 0
+        && sumSplits(splitsMap) == totalAmount;
+    }
+
+    match /groups/{groupId} {
+      allow read: if isAuthenticated() && request.auth.uid in resource.data.memberIds;
+      
+      allow create: if isAuthenticated()
+        && request.auth.uid in request.resource.data.memberIds
+        && request.resource.data.memberIds.size() <= 10;
+
+      allow update: if isAuthenticated() && (
+        (
+          request.auth.uid in resource.data.memberIds &&
+          request.resource.data.memberIds == resource.data.memberIds
+        ) || (
+          !(request.auth.uid in resource.data.memberIds) &&
+          request.resource.data.memberIds.hasAll(resource.data.memberIds) &&
+          request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1 &&
+          request.resource.data.memberIds.size() <= 10 &&
+          request.auth.uid in request.resource.data.memberIds &&
+          get(/databases/$(database)/documents/invites/$(request.resource.data.lastUsedInvite)).data.isUsed == false &&
+          getAfter(/databases/$(database)/documents/invites/$(request.resource.data.lastUsedInvite)).data.isUsed == true &&
+          getAfter(/databases/$(database)/documents/invites/$(request.resource.data.lastUsedInvite)).data.usedBy == request.auth.uid
+        )
+      );
+
+      match /expenses/{expenseId} {
+        allow read: if isGroupMember(groupId);
+
+        allow create: if isGroupMember(groupId)
+          && request.resource.data.createdBy == request.auth.uid
+          && isValidSplitSum(request.resource.data.splits, request.resource.data.baseAmount);
+
+        allow update: if isGroupMember(groupId)
+          && resource.data.createdBy == request.auth.uid
+          && request.resource.data.createdBy == resource.data.createdBy
+          && isValidSplitSum(request.resource.data.splits, request.resource.data.baseAmount);
+
+        allow delete: if isGroupMember(groupId)
+          && resource.data.createdBy == request.auth.uid;
+      }
+
+      match /receipts/{expenseId} {
+        allow read: if isGroupMember(groupId);
+        allow create, update: if isGroupMember(groupId)
+          && request.resource.data.createdBy == request.auth.uid
+          && request.resource.data.sizeBytes <= 900000;
+      }
+    }
+
+    match /invites/{token} {
+      allow get: if isAuthenticated();
+      allow list: if false;
+
+      allow create: if isAuthenticated()
+        && isGroupMember(request.resource.data.groupId)
+        && request.resource.data.isUsed == false;
+
+      allow update: if isAuthenticated()
+        && resource.data.isUsed == false
+        && request.resource.data.isUsed == true
+        && request.resource.data.usedBy == request.auth.uid
+        && request.resource.data.groupId == resource.data.groupId;
+    }
+  }
+}
