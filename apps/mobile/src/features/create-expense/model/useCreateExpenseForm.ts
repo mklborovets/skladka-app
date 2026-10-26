@@ -2,13 +2,9 @@ import { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import { GroupDoc, groupRepository } from '@entities/group';
 import { useAuth } from '@app/providers';
-import {
-  MemberListItem,
-} from '../ui/MembersSplitList';
-import {
-  SplitType,
-  computeSplits,
-} from './splitCalculator';
+import { ReceiptTooLargeError, processReceiptImage } from '@shared/lib/image';
+import { MemberListItem } from '../ui/MembersSplitList';
+import { SplitType, computeSplits } from './splitCalculator';
 
 export interface CreateExpenseFormState {
   title: string;
@@ -24,13 +20,14 @@ export interface UseCreateExpenseFormReturn {
   splitPreview: MemberListItem[];
   totalAmountMinor: number;
   isSubmitting: boolean;
+  isCompressingReceipt: boolean;
   error: string | null;
   setTitle: (title: string) => void;
   setAmount: (amount: string) => void;
   setCurrency: (currency: string) => void;
   setSplitType: (type: SplitType) => void;
   updateMemberShare: (userId: string, newShare: number) => void;
-  attachReceipt: (base64: string | null) => void;
+  attachReceipt: (sourceUri: string | null) => Promise<void>;
   submitExpense: () => Promise<string | null>;
 }
 
@@ -49,6 +46,7 @@ export const useCreateExpenseForm = (
   const [receiptBase64, setReceiptBase64] = useState<string | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isCompressingReceipt, setIsCompressingReceipt] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -90,6 +88,28 @@ export const useCreateExpenseForm = (
       ...prev,
       [userId]: newShare,
     }));
+  };
+
+  const attachReceipt = async (sourceUri: string | null): Promise<void> => {
+    if (!sourceUri) {
+      setReceiptBase64(null);
+      return;
+    }
+
+    try {
+      setIsCompressingReceipt(true);
+      setError(null);
+      const processed = await processReceiptImage(sourceUri);
+      setReceiptBase64(processed.base64Data);
+    } catch (err: unknown) {
+      if (err instanceof ReceiptTooLargeError) {
+        setError(err.message);
+      } else {
+        setError('Failed to compress receipt image');
+      }
+    } finally {
+      setIsCompressingReceipt(false);
+    }
   };
 
   const submitExpense = async (): Promise<string | null> => {
@@ -142,6 +162,21 @@ export const useCreateExpenseForm = (
 
       await expenseDocRef.set(expenseData);
 
+      if (receiptBase64) {
+        await firestore()
+          .collection('groups')
+          .doc(groupId)
+          .collection('receipts')
+          .doc(expenseDocRef.id)
+          .set({
+            expenseId: expenseDocRef.id,
+            createdBy: user.uid,
+            base64Data: receiptBase64,
+            sizeBytes: Math.round((receiptBase64.length * 3) / 4),
+            createdAt: Date.now(),
+          });
+      }
+
       onSuccess?.(expenseDocRef.id);
       return expenseDocRef.id;
     } catch (err: unknown) {
@@ -166,13 +201,14 @@ export const useCreateExpenseForm = (
     splitPreview,
     totalAmountMinor,
     isSubmitting,
+    isCompressingReceipt,
     error,
     setTitle,
     setAmount: setAmountInput,
     setCurrency,
     setSplitType,
     updateMemberShare,
-    attachReceipt: setReceiptBase64,
+    attachReceipt,
     submitExpense,
   };
 };
