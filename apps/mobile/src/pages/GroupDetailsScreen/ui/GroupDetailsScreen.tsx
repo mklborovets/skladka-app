@@ -90,6 +90,13 @@ export const GroupDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
               size="md"
               style={styles.actionBtn}
             />
+            <Button
+              title="Settle Up"
+              onPress={() => navigation.navigate('Debts', { groupId })}
+              variant="secondary"
+              size="md"
+              style={styles.actionBtn}
+            />
           </View>
         </View>
       )}

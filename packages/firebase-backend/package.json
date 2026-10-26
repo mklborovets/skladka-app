@@ -6,7 +6,7 @@
   "scripts": {
     "emulators": "firebase emulators:start --config firebase.json",
     "seed": "node --experimental-strip-types seed/seed.ts",
-    "test": "node --experimental-strip-types --test tests/rules.test.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

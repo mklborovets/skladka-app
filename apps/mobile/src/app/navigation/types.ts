@@ -3,5 +3,6 @@ export type RootStackParamList = {
   GroupsList: undefined;
   GroupDetails: { groupId: string };
   CreateExpense: { groupId: string };
+  Debts: { groupId: string };
   InvitePreview: { token: string };
 };

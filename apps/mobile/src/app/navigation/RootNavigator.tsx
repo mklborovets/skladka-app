@@ -5,6 +5,7 @@ import { useAuth } from '@app/providers';
 import {
   AuthScreen,
   CreateExpenseScreen,
+  DebtsScreen,
   GroupDetailsScreen,
   GroupsListScreen,
   InvitePreviewScreen,
@@ -53,6 +54,7 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen name="GroupsList" component={GroupsListScreen} />
             <Stack.Screen name="GroupDetails" component={GroupDetailsScreen} />
             <Stack.Screen name="CreateExpense" component={CreateExpenseScreen} />
+            <Stack.Screen name="Debts" component={DebtsScreen} />
             <Stack.Screen
               name="InvitePreview"
               component={InvitePreviewScreen}
