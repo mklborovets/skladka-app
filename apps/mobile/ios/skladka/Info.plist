@@ -26,6 +26,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>skladka</string>
+				<string>com.googleusercontent.apps.000000000000-dummy</string>
 			</array>
 		</dict>
 	</array>

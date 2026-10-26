@@ -1,4 +1,9 @@
 #import "AppDelegate.h"
+#if __has_include(<FirebaseCore/FirebaseCore.h>)
+#import <FirebaseCore/FirebaseCore.h>
+#elif __has_include(<Firebase.h>)
+#import <Firebase.h>
+#endif
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
 
@@ -8,6 +13,15 @@
 {
   self.moduleName = @"skladka";
   self.initialProps = @{};
+
+#if __has_include(<FirebaseCore/FirebaseCore.h>) || __has_include(<Firebase.h>)
+  if ([FIRApp defaultApp] == nil) {
+    NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
+    if (filePath) {
+      [FIRApp configure];
+    }
+  }
+#endif
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
