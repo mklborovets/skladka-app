@@ -9,6 +9,7 @@
   "scripts": {
     "start": "npm --prefix apps/mobile start",
     "android": "npm --prefix apps/mobile run android",
-    "emulators": "npm --prefix packages/firebase-backend run emulators"
+    "emulators": "npm --prefix packages/firebase-backend run emulators",
+    "seed": "npm --prefix packages/firebase-backend run seed"
   }
 }

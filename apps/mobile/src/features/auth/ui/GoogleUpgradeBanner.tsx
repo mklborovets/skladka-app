@@ -25,17 +25,17 @@ export const GoogleUpgradeBanner: React.FC<GoogleUpgradeBannerProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.headerRow}>
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>Анонімний режим</Text>
+          <Text style={styles.badgeText}>Anonymous Mode</Text>
         </View>
       </View>
-      <Text style={styles.title}>Привʼяжіть Google акаунт</Text>
+      <Text style={styles.title}>Link Google Account</Text>
       <Text style={styles.description}>
-        Анонімний профіль діє лише на цьому пристрої. Підключіть Google, щоб не
-        втратити доступ до спільних витрат при видаленні застосунку.
+        Anonymous profile is stored only on this device. Link Google to prevent
+        losing access to your shared groups and expenses.
       </Text>
       {error && <ErrorBanner message={error} />}
       <Button
-        title="Підключити Google"
+        title="Connect Google"
         onPress={onUpgrade}
         loading={loading}
         variant="primary"

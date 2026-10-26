@@ -31,7 +31,7 @@ export const ErrorBanner: React.FC<ErrorBannerProps> = ({
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={styles.retryButton}
           >
-            <Text style={styles.retryText}>Повторити</Text>
+            <Text style={styles.retryText}>Retry</Text>
           </TouchableOpacity>
         )}
       </View>

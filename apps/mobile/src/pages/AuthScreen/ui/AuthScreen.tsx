@@ -35,7 +35,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
         </View>
         <Text style={styles.brandTitle}>SKLADKA</Text>
         <Text style={styles.brandSubtitle}>
-          Спільні витрати, чесний розподіл та прозорі баланси
+          Shared expenses, fair split, and transparent balances
         </Text>
       </View>
 
@@ -44,7 +44,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
       {!user ? (
         <View style={styles.actionsContainer}>
           <Button
-            title="Продовжити анонімно"
+            title="Continue anonymously"
             onPress={signInAnonymously}
             loading={isLoading}
             variant="primary"
@@ -53,7 +53,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
           />
 
           <Button
-            title="Увійти через Google"
+            title="Sign in with Google"
             onPress={linkWithGoogle}
             loading={isLoading}
             variant="secondary"
@@ -64,9 +64,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
       ) : (
         <View style={styles.profileContainer}>
           <View style={styles.userCard}>
-            <Text style={styles.userCardLabel}>Поточний профіль</Text>
+            <Text style={styles.userCardLabel}>Current Profile</Text>
             <Text style={styles.userCardEmail}>
-              {user.email || 'Анонімний користувач'}
+              {user.email || 'Anonymous User'}
             </Text>
             <Text style={styles.userCardUid}>UID: {user.uid}</Text>
           </View>
@@ -81,7 +81,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
 
           {onSuccess && (
             <Button
-              title="Перейти до груп"
+              title="Continue to Groups"
               onPress={onSuccess}
               variant="primary"
               size="lg"
@@ -90,7 +90,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
           )}
 
           <Button
-            title="Вийти з акаунта"
+            title="Sign Out"
             onPress={signOut}
             loading={isLoading}
             variant="ghost"

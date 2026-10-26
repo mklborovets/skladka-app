@@ -47,10 +47,10 @@ export const SyncBadge: React.FC<SyncBadgeProps> = ({
   const displayText =
     label ??
     (isPendingNetwork
-      ? 'Очікує мережі'
+      ? 'Waiting for network'
       : isPendingBalance
-      ? 'Синхронізація'
-      : 'Синхронізовано');
+      ? 'Syncing'
+      : 'Synced');
 
   if (compact) {
     return (

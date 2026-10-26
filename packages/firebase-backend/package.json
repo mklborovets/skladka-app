@@ -2,7 +2,10 @@
   "name": "@skladka/firebase-backend",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "emulators": "firebase emulators:start --config firebase.json"
+    "emulators": "firebase emulators:start --config firebase.json",
+    "seed": "node --experimental-strip-types seed/seed.ts",
+    "typecheck": "tsc --noEmit"
   }
 }

@@ -57,7 +57,7 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
       await auth().signInAnonymously();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : 'Помилка анонімного входу';
+        err instanceof Error ? err.message : 'Anonymous sign-in failed';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -83,7 +83,7 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
 
       const idToken = response.data.idToken;
       if (!idToken) {
-        throw new Error('Не вдалося отримати токен авторизації Google');
+        throw new Error('Failed to retrieve Google authentication token');
       }
 
       const credential = auth.GoogleAuthProvider.credential(idToken);
@@ -105,18 +105,18 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
         return;
       }
       if (errorObj?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        setError('Служби Google Play недоступні або застарілі');
+        setError('Google Play Services unavailable or outdated');
         return;
       }
       if (
         errorObj?.code === 'auth/credential-already-in-use' ||
         errorObj?.code === 'auth/email-already-in-use'
       ) {
-        setError('Цей Google акаунт уже привʼязаний до іншого користувача');
+        setError('This Google account is already linked to another user');
         return;
       }
       const message =
-        err instanceof Error ? err.message : 'Помилка авторизації через Google';
+        err instanceof Error ? err.message : 'Google authentication failed';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -131,7 +131,7 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
       await auth().signOut();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : 'Помилка виходу з акаунта';
+        err instanceof Error ? err.message : 'Sign out failed';
       setError(message);
     } finally {
       setIsLoading(false);
