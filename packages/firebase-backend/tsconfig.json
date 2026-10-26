@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["seed/**/*"]
+  "include": ["seed/**/*", "tests/**/*"]
 }
