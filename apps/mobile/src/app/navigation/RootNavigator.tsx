@@ -1,7 +1,11 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import {
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '@app/providers';
+import { pendingInviteStore } from '@features/join-by-invite';
 import {
   AuthScreen,
   CreateExpenseScreen,
@@ -18,9 +22,39 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator: React.FC = () => {
   const { user } = useAuth();
+  const navigationRef = useNavigationContainerRef<RootStackParamList>();
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const checkPendingInvite = () => {
+      const pendingToken = pendingInviteStore.get();
+      if (pendingToken && navigationRef.isReady()) {
+        pendingInviteStore.set(null);
+        navigationRef.navigate('InvitePreview', { token: pendingToken });
+      }
+    };
+
+    const timer = setTimeout(checkPendingInvite, 150);
+
+    const unsubscribe = pendingInviteStore.subscribe(token => {
+      if (token && navigationRef.isReady()) {
+        pendingInviteStore.set(null);
+        navigationRef.navigate('InvitePreview', { token });
+      }
+    });
+
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [user, navigationRef]);
 
   return (
     <NavigationContainer
+      ref={navigationRef}
       linking={linking}
       theme={{
         dark: true,

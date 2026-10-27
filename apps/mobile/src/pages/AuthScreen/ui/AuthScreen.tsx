@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {
   Button,
@@ -10,6 +10,7 @@ import {
   typography,
 } from '@shared/ui';
 import { GoogleUpgradeBanner } from '@features/auth';
+import { pendingInviteStore } from '@features/join-by-invite';
 import { useAuth } from '@app/providers';
 
 export interface AuthScreenProps {
@@ -27,6 +28,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
     signOut,
   } = useAuth();
 
+  const [pendingInvite, setPendingInvite] = useState<string | null>(
+    pendingInviteStore.get()
+  );
+
+  useEffect(() => {
+    return pendingInviteStore.subscribe(setPendingInvite);
+  }, []);
+
   return (
     <ScreenLayout scrollable>
       <View style={styles.brandContainer}>
@@ -38,6 +47,15 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccess }) => {
           Shared expenses, fair split, and transparent balances
         </Text>
       </View>
+
+      {pendingInvite && !user && (
+        <View style={styles.inviteNoticeCard}>
+          <Text style={styles.inviteNoticeBadge}>GROUP INVITATION RECEIVED</Text>
+          <Text style={styles.inviteNoticeText}>
+            Sign in or continue as guest to view and join the group.
+          </Text>
+        </View>
+      )}
 
       {error && <ErrorBanner message={error} />}
 
@@ -176,4 +194,27 @@ const styles = StyleSheet.create({
   signOutButton: {
     marginTop: spacing.sm,
   },
+  inviteNoticeCard: {
+    backgroundColor: colors.surfaceElevated,
+    borderColor: colors.primary,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    alignItems: 'center',
+  },
+  inviteNoticeBadge: {
+    ...typography.label,
+    color: colors.primaryLight,
+    fontWeight: '700',
+    marginBottom: spacing.xs,
+    letterSpacing: 0.5,
+  },
+  inviteNoticeText: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
 });
+
