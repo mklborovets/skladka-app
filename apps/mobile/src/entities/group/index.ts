@@ -1,4 +1,5 @@
 export * from './model/types';
+export * from './model/memberNames';
 export * from './model/useUserGroups';
 export * from './model/useGroupDetails';
 export * from './model/balanceEngine';

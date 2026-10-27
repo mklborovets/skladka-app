@@ -8,7 +8,11 @@ export interface UseGroupDetailsReturn {
   error: string | null;
 }
 
-export const useGroupDetails = (groupId: string): UseGroupDetailsReturn => {
+export const useGroupDetails = (
+  groupId: string,
+  currentUserId?: string,
+  currentNickname?: string
+): UseGroupDetailsReturn => {
   const [group, setGroup] = useState<GroupDoc | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,6 +32,17 @@ export const useGroupDetails = (groupId: string): UseGroupDetailsReturn => {
       loaded => {
         setGroup(loaded);
         setIsLoading(false);
+        if (
+          loaded &&
+          currentUserId &&
+          currentNickname &&
+          loaded.memberIds.includes(currentUserId) &&
+          loaded.memberNames?.[currentUserId] !== currentNickname.trim()
+        ) {
+          groupRepository
+            .updateMemberName(loaded.id, currentUserId, currentNickname.trim())
+            .catch(() => null);
+        }
       },
       err => {
         setError(err.message);
@@ -36,7 +51,7 @@ export const useGroupDetails = (groupId: string): UseGroupDetailsReturn => {
     );
 
     return unsubscribe;
-  }, [groupId]);
+  }, [groupId, currentUserId, currentNickname]);
 
   return {
     group,

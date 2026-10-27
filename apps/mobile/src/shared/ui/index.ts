@@ -6,3 +6,4 @@ export * from './Input';
 export * from './EmptyState';
 export * from './ErrorBanner';
 export * from './SyncBadge';
+export * from './Icons';

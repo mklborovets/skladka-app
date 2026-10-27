@@ -14,6 +14,7 @@ export interface DebtTransferCardProps {
   transfer: DebtTransfer;
   currency: string;
   currentUserId: string;
+  resolvedMemberNames?: Record<string, string>;
   onSettle?: (transfer: DebtTransfer) => void;
   style?: StyleProp<ViewStyle>;
 }
@@ -22,14 +23,26 @@ export const DebtTransferCard: React.FC<DebtTransferCardProps> = ({
   transfer,
   currency,
   currentUserId,
+  resolvedMemberNames = {},
   onSettle,
   style,
 }) => {
   const isSender = transfer.from === currentUserId;
   const isReceiver = transfer.to === currentUserId;
 
-  const senderName = isSender ? 'You' : transfer.from.substring(0, 8);
-  const receiverName = isReceiver ? 'You' : transfer.to.substring(0, 8);
+  const senderName = isSender
+    ? 'You'
+    : resolvedMemberNames[transfer.from] ||
+      (transfer.from.length > 4
+        ? `Anon #${transfer.from.slice(-4)}`
+        : transfer.from);
+
+  const receiverName = isReceiver
+    ? 'You'
+    : resolvedMemberNames[transfer.to] ||
+      (transfer.to.length > 4
+        ? `Anon #${transfer.to.slice(-4)}`
+        : transfer.to);
 
   const formattedAmount = (transfer.amount / 100).toFixed(2);
 

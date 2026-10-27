@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@app/navigation/types';
 import { useAuth } from '@app/providers';
 import { useGroupDetails } from '@entities/group';
 import { CreateInviteModal } from '@features/join-by-invite';
+import { GroupSettingsModal } from '@features/manage-group';
 import {
   AppHeader,
   Button,
   ErrorBanner,
   ScreenLayout,
+  SettingsIcon,
   colors,
   radius,
   spacing,
@@ -22,8 +24,13 @@ type Props = NativeStackScreenProps<RootStackParamList, 'GroupDetails'>;
 export const GroupDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { groupId } = route.params;
   const { user } = useAuth();
-  const { group, isLoading, error } = useGroupDetails(groupId);
+  const { group, isLoading, error } = useGroupDetails(
+    groupId,
+    user?.uid,
+    user?.displayName || undefined
+  );
   const [isInviteVisible, setIsInviteVisible] = useState<boolean>(false);
+  const [isSettingsVisible, setIsSettingsVisible] = useState<boolean>(false);
 
   if (!user) {
     return null;
@@ -57,12 +64,22 @@ export const GroupDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         }
         onBack={() => navigation.goBack()}
         rightSlot={
-          <Button
-            title="+ Invite"
-            onPress={() => setIsInviteVisible(true)}
-            variant="ghost"
-            size="sm"
-          />
+          <View style={styles.headerRight}>
+            <Button
+              title="+ Invite"
+              onPress={() => setIsInviteVisible(true)}
+              variant="ghost"
+              size="sm"
+            />
+            <TouchableOpacity
+              onPress={() => setIsSettingsVisible(true)}
+              style={styles.settingsButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              accessibilityLabel="Group settings"
+            >
+              <SettingsIcon size={18} color={colors.textPrimary} />
+            </TouchableOpacity>
+          </View>
         }
       />
 
@@ -106,9 +123,23 @@ export const GroupDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
           groupId={groupId}
           baseCurrency={group.baseCurrency}
           currentUserId={user.uid}
+          memberNames={group.memberNames}
+          memberIds={group.memberIds}
           onAddExpense={() =>
             navigation.navigate('CreateExpense', { groupId })
           }
+        />
+      )}
+
+      {group && (
+        <GroupSettingsModal
+          visible={isSettingsVisible}
+          group={group}
+          currentUserId={user.uid}
+          onClose={() => setIsSettingsVisible(false)}
+          onGroupDeleted={() => navigation.navigate('GroupsList')}
+          onGroupLeft={() => navigation.navigate('GroupsList')}
+          onOpenInvite={() => setIsInviteVisible(true)}
         />
       )}
 
@@ -126,6 +157,22 @@ export const GroupDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  settingsButton: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceElevated,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsIcon: {
+    fontSize: 16,
+  },
   summaryCard: {
     backgroundColor: colors.surfaceElevated,
     borderRadius: radius.lg,

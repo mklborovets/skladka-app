@@ -1,14 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
-  Alert,
   Modal,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Button, ErrorBanner, colors, radius, spacing, typography } from '@shared/ui';
-import { useAuth } from '@app/providers';
+import {
+  Button,
+  ErrorBanner,
+  PencilIcon,
+  colors,
+  radius,
+  spacing,
+  typography,
+} from '@shared/ui';
+import { useProfileModal } from '../model/useProfileModal';
 import { GoogleUpgradeBanner } from './GoogleUpgradeBanner';
 
 export interface ProfileModalProps {
@@ -20,50 +28,28 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   visible,
   onClose,
 }) => {
-  const { user, isAnonymous, isLoading, error, linkWithGoogle, signOut, clearError } =
-    useAuth();
-
-  useEffect(() => {
-    if (visible) {
-      clearError();
-    }
-  }, [visible, clearError]);
+  const {
+    user,
+    isAnonymous,
+    isLoading,
+    error,
+    displayLabel,
+    avatarLetter,
+    isEditingNick,
+    nickInput,
+    nickError,
+    isSavingNick,
+    setNickInput,
+    startEditingNickname,
+    saveNickname,
+    cancelEditingNickname,
+    confirmAndSignOut,
+    linkWithGoogle,
+  } = useProfileModal(visible, onClose);
 
   if (!user) {
     return null;
   }
-
-  const handleSignOut = () => {
-    if (isAnonymous) {
-      Alert.alert(
-        'Sign out of anonymous account?',
-        'Warning: You are currently signed in as a guest. If you sign out without linking to Google, this anonymous profile and access to your groups will be permanently lost on this device.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Sign Out Anyway',
-            style: 'destructive',
-            onPress: async () => {
-              onClose();
-              await signOut();
-            },
-          },
-        ]
-      );
-    } else {
-      Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: async () => {
-            onClose();
-            await signOut();
-          },
-        },
-      ]);
-    }
-  };
 
   return (
     <Modal
@@ -89,18 +75,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <View style={styles.userCard}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {isAnonymous
-                  ? '👤'
-                  : (user.displayName?.[0] || user.email?.[0] || 'U').toUpperCase()}
-              </Text>
+              <Text style={styles.avatarText}>{avatarLetter}</Text>
             </View>
             <View style={styles.userInfo}>
               <View style={styles.badgeRow}>
-                <Text style={styles.userName}>
-                  {user.displayName ||
-                    (isAnonymous ? 'Anonymous User' : 'User')}
-                </Text>
+                <View style={styles.nameWithEditRow}>
+                  <Text style={styles.userName} numberOfLines={1}>
+                    {displayLabel}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={startEditingNickname}
+                    style={styles.editPencilBtn}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    accessibilityLabel="Edit nickname"
+                  >
+                    <PencilIcon size={14} color={colors.primaryLight} />
+                  </TouchableOpacity>
+                </View>
                 <View
                   style={[
                     styles.statusBadge,
@@ -112,6 +103,43 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </Text>
                 </View>
               </View>
+
+              {isEditingNick ? (
+                <View style={styles.editSection}>
+                  <View style={styles.nickInputRow}>
+                    <TextInput
+                      style={styles.nickInput}
+                      value={nickInput}
+                      onChangeText={setNickInput}
+                      placeholder="Enter nickname"
+                      placeholderTextColor={colors.textMuted}
+                      autoFocus
+                      maxLength={20}
+                      autoCapitalize="none"
+                    />
+                    <TouchableOpacity
+                      onPress={saveNickname}
+                      disabled={isSavingNick}
+                      style={[styles.nickBtn, styles.nickSaveBtn]}
+                    >
+                      <Text style={styles.nickSaveText}>
+                        {isSavingNick ? '...' : 'Save'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={cancelEditingNickname}
+                      disabled={isSavingNick}
+                      style={[styles.nickBtn, styles.nickCancelBtn]}
+                    >
+                      <Text style={styles.nickCancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {nickError && (
+                    <Text style={styles.nickErrorText}>{nickError}</Text>
+                  )}
+                </View>
+              ) : null}
+
               {user.email ? (
                 <Text style={styles.userEmail}>{user.email}</Text>
               ) : null}
@@ -135,7 +163,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <Button
             title="Sign Out"
-            onPress={handleSignOut}
+            onPress={confirmAndSignOut}
             loading={isLoading}
             variant="ghost"
             size="md"
@@ -220,6 +248,71 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular,
     fontWeight: '600',
     color: colors.textPrimary,
+    flexShrink: 1,
+  },
+  nameWithEditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 1,
+    marginRight: spacing.xs,
+  },
+  editPencilBtn: {
+    padding: 3,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surfaceHighlight,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+  },
+  editSection: {
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  nickInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  nickInput: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    color: colors.textPrimary,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    fontSize: 13,
+  },
+  nickBtn: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 5,
+    borderRadius: radius.sm,
+  },
+  nickSaveBtn: {
+    backgroundColor: colors.primary,
+  },
+  nickSaveText: {
+    ...typography.label,
+    color: colors.primaryText,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  nickCancelBtn: {
+    backgroundColor: colors.surfaceHighlight,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+  },
+  nickCancelText: {
+    ...typography.label,
+    color: colors.textSecondary,
+    fontSize: 11,
+  },
+  nickErrorText: {
+    ...typography.bodySmall,
+    color: colors.danger,
+    fontSize: 11,
+    marginTop: 2,
   },
   statusBadge: {
     paddingHorizontal: spacing.xs,

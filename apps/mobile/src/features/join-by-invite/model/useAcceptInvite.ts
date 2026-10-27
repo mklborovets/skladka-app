@@ -4,7 +4,11 @@ import { GroupDoc } from '@entities/group';
 import { InviteDoc } from '@entities/invite';
 
 export interface UseAcceptInviteReturn {
-  acceptInvite: (token: string, userId: string) => Promise<string | null>;
+  acceptInvite: (
+    token: string,
+    userId: string,
+    nickname?: string
+  ) => Promise<string | null>;
   isJoining: boolean;
   error: string | null;
 }
@@ -15,7 +19,8 @@ export const useAcceptInvite = (): UseAcceptInviteReturn => {
 
   const acceptInvite = async (
     token: string,
-    userId: string
+    userId: string,
+    nickname?: string
   ): Promise<string | null> => {
     try {
       setIsJoining(true);
@@ -47,6 +52,12 @@ export const useAcceptInvite = (): UseAcceptInviteReturn => {
 
           const groupData = groupDoc.data() as GroupDoc;
           if (groupData.memberIds.includes(userId)) {
+            if (nickname && groupData.memberNames?.[userId] !== nickname.trim()) {
+              transaction.update(groupRef, {
+                [`memberNames.${userId}`]: nickname.trim(),
+                updatedAt: Date.now(),
+              });
+            }
             return inviteData.groupId;
           }
 
@@ -59,12 +70,18 @@ export const useAcceptInvite = (): UseAcceptInviteReturn => {
             usedBy: userId,
           });
 
+          const nextMemberNames = { ...(groupData.memberNames || {}) };
+          if (nickname && nickname.trim()) {
+            nextMemberNames[userId] = nickname.trim();
+          }
+
           transaction.update(groupRef, {
             memberIds: [...groupData.memberIds, userId],
             balances: {
               ...groupData.balances,
               [userId]: 0,
             },
+            memberNames: nextMemberNames,
             lastUsedInvite: token,
             updatedAt: Date.now(),
           });

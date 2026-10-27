@@ -1,12 +1,16 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { DebtTransfer, DebtTransferCard, minimizeDebts } from '@entities/debt';
+import { DebtTransfer, DebtTransferCard } from '@entities/debt';
 import { EmptyState, colors, spacing, typography } from '@shared/ui';
+import { useDebtsSummary } from '../model/useDebtsSummary';
 
 export interface DebtsSummaryProps {
   balances: Record<string, number>;
   currency: string;
   currentUserId: string;
+  currentUserNickname?: string;
+  memberNames?: Record<string, string>;
+  memberIds?: string[];
   onSettleUp?: (transfer: DebtTransfer) => void;
 }
 
@@ -14,9 +18,18 @@ export const DebtsSummary: React.FC<DebtsSummaryProps> = ({
   balances,
   currency,
   currentUserId,
+  currentUserNickname,
+  memberNames,
+  memberIds,
   onSettleUp,
 }) => {
-  const transfers = useMemo(() => minimizeDebts(balances), [balances]);
+  const { transfers, memberNameMap } = useDebtsSummary({
+    balances,
+    memberIds,
+    memberNames,
+    currentUserId,
+    currentUserNickname,
+  });
 
   return (
     <View style={styles.container}>
@@ -40,6 +53,7 @@ export const DebtsSummary: React.FC<DebtsSummaryProps> = ({
               transfer={item}
               currency={currency}
               currentUserId={currentUserId}
+              resolvedMemberNames={memberNameMap}
               onSettle={onSettleUp}
             />
           ))}

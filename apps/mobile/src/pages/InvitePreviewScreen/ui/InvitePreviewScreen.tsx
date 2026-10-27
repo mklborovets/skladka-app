@@ -16,7 +16,11 @@ export const InvitePreviewScreen: React.FC<Props> = ({ route, navigation }) => {
     if (!user) {
       return;
     }
-    const joinedGroupId = await acceptInvite(token, user.uid);
+    const joinedGroupId = await acceptInvite(
+      token,
+      user.uid,
+      user.displayName || undefined
+    );
     if (joinedGroupId) {
       navigation.navigate('GroupDetails', { groupId: joinedGroupId });
     } else {

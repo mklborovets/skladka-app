@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
-import { GroupDoc, groupRepository, syncExpenseBalance } from '@entities/group';
+import {
+  GroupDoc,
+  groupRepository,
+  resolveGroupMemberNames,
+  syncExpenseBalance,
+} from '@entities/group';
 import { useAuth } from '@app/providers';
 import { exchangeRateService } from '@shared/lib/currency';
 import { ReceiptTooLargeError, processReceiptImage } from '@shared/lib/image';
@@ -104,8 +109,19 @@ export const useCreateExpenseForm = (
     memberValues
   );
 
+  const memberNameMap = resolveGroupMemberNames({
+    memberIds,
+    memberNames: group?.memberNames,
+    currentUserId: user?.uid,
+    currentUserNickname: user?.displayName || undefined,
+  });
+
   const splitPreview: MemberListItem[] = memberIds.map(uid => ({
     userId: uid,
+    displayName:
+      uid === user?.uid
+        ? `${memberNameMap[uid] || 'You'} (You)`
+        : memberNameMap[uid],
     share: memberValues[uid] ?? (splitType === 'SHARES' ? 1 : 0),
     calculatedAmount: splits[uid] ?? 0,
   }));

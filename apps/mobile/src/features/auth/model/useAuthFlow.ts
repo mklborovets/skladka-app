@@ -5,6 +5,8 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import { ENV } from '@shared/config';
+import { deriveNicknameFromEmail } from '@shared/lib';
+import { groupRepository } from '@entities/group';
 
 let isGoogleConfigured = false;
 
@@ -27,6 +29,7 @@ export interface UseAuthFlowReturn {
   signInAnonymously: () => Promise<void>;
   linkWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  updateNickname: (nickname: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -39,7 +42,17 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
 
   useEffect(() => {
     ensureGoogleConfigured();
-    const unsubscribe = auth().onAuthStateChanged(nextUser => {
+    const unsubscribe = auth().onAuthStateChanged(async nextUser => {
+      if (nextUser && nextUser.email && !nextUser.displayName) {
+        const derived = deriveNicknameFromEmail(nextUser.email);
+        if (derived) {
+          await nextUser.updateProfile({ displayName: derived }).catch(() => null);
+          await nextUser.reload().catch(() => null);
+          setUser(auth().currentUser);
+          setIsLoading(false);
+          return;
+        }
+      }
       setUser(nextUser);
       setIsLoading(false);
     });
@@ -118,6 +131,16 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
         const userCredential = await auth().signInWithCredential(credential);
         setUser(userCredential.user ?? auth().currentUser);
       }
+
+      const activeUser = auth().currentUser;
+      if (activeUser?.email) {
+        const derived = deriveNicknameFromEmail(activeUser.email);
+        if (derived && (!activeUser.displayName || activeUser.displayName === activeUser.email)) {
+          await activeUser.updateProfile({ displayName: derived }).catch(() => null);
+          await activeUser.reload().catch(() => null);
+          setUser(auth().currentUser);
+        }
+      }
     } catch (err: unknown) {
       const errorObj = err as { code?: string; message?: string };
       if (errorObj?.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -159,6 +182,35 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
     }
   };
 
+  const updateNickname = async (nickname: string): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const trimmed = nickname.trim();
+      if (!trimmed) {
+        throw new Error('Nickname cannot be empty');
+      }
+      const current = auth().currentUser;
+      if (!current) {
+        throw new Error('User not signed in');
+      }
+
+      await current.updateProfile({ displayName: trimmed });
+      await current.reload().catch(() => null);
+      const updated = auth().currentUser;
+      setUser(updated);
+
+      await groupRepository.updateNicknameInUserGroups(current.uid, trimmed).catch(() => null);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to update nickname';
+      setError(message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signOut = async (): Promise<void> => {
     try {
       setIsLoading(true);
@@ -182,6 +234,7 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
     signInAnonymously,
     linkWithGoogle,
     signOut,
+    updateNickname,
     clearError,
   };
 };

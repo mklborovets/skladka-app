@@ -1,14 +1,16 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { ExpenseRow, useGroupExpenses } from '@entities/expense';
+import { ExpenseRow } from '@entities/expense';
 import { EmptyState, ErrorBanner, colors, spacing, typography } from '@shared/ui';
-import { useReceiptViewer } from '../model/useReceiptViewer';
+import { useExpensesFeed } from '../model/useExpensesFeed';
 import { ReceiptViewerModal } from './ReceiptViewerModal';
 
 export interface ExpensesFeedProps {
   groupId: string;
   baseCurrency: string;
   currentUserId: string;
+  memberNames?: Record<string, string>;
+  memberIds?: string[];
   onAddExpense?: () => void;
 }
 
@@ -16,17 +18,22 @@ export const ExpensesFeed: React.FC<ExpensesFeedProps> = ({
   groupId,
   baseCurrency,
   currentUserId,
+  memberNames,
+  memberIds,
   onAddExpense,
 }) => {
-  const { expenses, isLoading, error } = useGroupExpenses(groupId);
   const {
-    isOpen: isReceiptOpen,
-    receipt,
-    isLoading: isReceiptLoading,
-    error: receiptError,
-    openReceipt,
-    closeReceipt,
-  } = useReceiptViewer(groupId);
+    expenses,
+    isLoading,
+    error,
+    memberNameMap,
+    receiptViewer,
+  } = useExpensesFeed({
+    groupId,
+    currentUserId,
+    memberNames,
+    memberIds,
+  });
 
   return (
     <View style={styles.container}>
@@ -57,18 +64,19 @@ export const ExpensesFeed: React.FC<ExpensesFeedProps> = ({
               expense={item}
               currentUserId={currentUserId}
               baseCurrency={baseCurrency}
-              onPressReceipt={openReceipt}
+              resolvedMemberNames={memberNameMap}
+              onPressReceipt={receiptViewer.openReceipt}
             />
           ))}
         </View>
       )}
 
       <ReceiptViewerModal
-        visible={isReceiptOpen}
-        receipt={receipt}
-        isLoading={isReceiptLoading}
-        error={receiptError}
-        onClose={closeReceipt}
+        visible={receiptViewer.isOpen}
+        receipt={receiptViewer.receipt}
+        isLoading={receiptViewer.isLoading}
+        error={receiptViewer.error}
+        onClose={receiptViewer.closeReceipt}
       />
     </View>
   );

@@ -18,7 +18,11 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Debts'>;
 export const DebtsScreen: React.FC<Props> = ({ route, navigation }) => {
   const { groupId } = route.params;
   const { user } = useAuth();
-  const { group, isLoading, error } = useGroupDetails(groupId);
+  const { group, isLoading, error } = useGroupDetails(
+    groupId,
+    user?.uid,
+    user?.displayName || undefined
+  );
 
   if (!user) {
     return null;
@@ -43,6 +47,9 @@ export const DebtsScreen: React.FC<Props> = ({ route, navigation }) => {
           balances={group.balances}
           currency={group.baseCurrency}
           currentUserId={user.uid}
+          currentUserNickname={user.displayName || undefined}
+          memberNames={group.memberNames}
+          memberIds={group.memberIds}
         />
       ) : null}
     </ScreenLayout>

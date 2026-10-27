@@ -6,6 +6,7 @@ export interface GroupDoc {
   baseCurrency: CurrencyCode;
   memberIds: string[];
   balances: Record<string, number>;
+  memberNames?: Record<string, string>;
   processedExpenseIds: string[];
   lastUsedInvite?: string;
   updatedAt: number;
@@ -15,4 +16,5 @@ export interface CreateGroupInput {
   name: string;
   baseCurrency: CurrencyCode;
   creatorId: string;
+  creatorName?: string;
 }

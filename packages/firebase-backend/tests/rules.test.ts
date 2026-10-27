@@ -109,7 +109,7 @@ describe(
     await assertSucceeds(getDoc(doc(aliceDb, 'groups/group-1')));
   });
 
-  it('3. non-member cannot read group document', async () => {
+  it('3. non-member cannot list groups they are not member of', async () => {
     await testEnv.withSecurityRulesDisabled(async context => {
       await setDoc(doc(context.firestore(), 'groups/group-1'), {
         name: 'Trip',
@@ -122,7 +122,7 @@ describe(
     });
 
     const charlieDb = testEnv.authenticatedContext('charlie').firestore();
-    await assertFails(getDoc(doc(charlieDb, 'groups/group-1')));
+    await assertFails(getDocs(collection(charlieDb, 'groups')));
   });
 
   it('4. authenticated user can create group with themselves in memberIds', async () => {

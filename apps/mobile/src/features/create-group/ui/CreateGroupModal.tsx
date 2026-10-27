@@ -15,6 +15,7 @@ const CURRENCIES: CurrencyCode[] = ['UAH', 'USD', 'EUR', 'PLN'];
 export interface CreateGroupModalProps {
   visible: boolean;
   creatorId: string;
+  creatorName?: string;
   onClose: () => void;
   onSuccess: (groupId: string) => void;
 }
@@ -22,6 +23,7 @@ export interface CreateGroupModalProps {
 export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   visible,
   creatorId,
+  creatorName,
   onClose,
   onSuccess,
 }) => {
@@ -45,7 +47,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    await submitGroup(creatorId);
+    await submitGroup(creatorId, creatorName);
   };
 
   return (

@@ -14,6 +14,7 @@ export interface ExpenseRowProps {
   expense: ExpenseDoc;
   currentUserId: string;
   baseCurrency: string;
+  resolvedMemberNames?: Record<string, string>;
   onPressReceipt?: (expenseId: string) => void;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
@@ -23,12 +24,19 @@ export const ExpenseRow: React.FC<ExpenseRowProps> = ({
   expense,
   currentUserId,
   baseCurrency,
+  resolvedMemberNames = {},
   onPressReceipt,
   onPress,
   style,
 }) => {
   const isPaidByMe = expense.paidBy === currentUserId;
-  const payerText = isPaidByMe ? 'Paid by you' : `Paid by ${expense.paidBy.substring(0, 6)}`;
+  const payerName = isPaidByMe
+    ? 'you'
+    : resolvedMemberNames[expense.paidBy] ||
+      (expense.paidBy.length > 4
+        ? `Anon #${expense.paidBy.slice(-4)}`
+        : expense.paidBy);
+  const payerText = `Paid by ${payerName}`;
 
   const formattedAmount = (expense.amount / 100).toFixed(2);
   const formattedBaseAmount = (expense.baseAmount / 100).toFixed(2);

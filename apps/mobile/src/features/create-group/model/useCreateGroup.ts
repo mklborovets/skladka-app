@@ -9,7 +9,7 @@ export interface UseCreateGroupReturn {
   setName: (name: string) => void;
   setBaseCurrency: (currency: CurrencyCode) => void;
   reset: () => void;
-  submitGroup: (creatorId: string) => Promise<string | null>;
+  submitGroup: (creatorId: string, creatorName?: string) => Promise<string | null>;
 }
 
 export const useCreateGroup = (
@@ -27,7 +27,10 @@ export const useCreateGroup = (
     setError(null);
   };
 
-  const submitGroup = async (creatorId: string): Promise<string | null> => {
+  const submitGroup = async (
+    creatorId: string,
+    creatorName?: string
+  ): Promise<string | null> => {
     const trimmed = name.trim();
     if (!trimmed) {
       setError('Please enter a group name');
@@ -42,6 +45,7 @@ export const useCreateGroup = (
         name: trimmed,
         baseCurrency,
         creatorId,
+        creatorName,
       });
 
       reset();

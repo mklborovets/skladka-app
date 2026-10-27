@@ -110,6 +110,7 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
       <CreateGroupModal
         visible={isModalVisible}
         creatorId={user.uid}
+        creatorName={user.displayName || undefined}
         onClose={() => setIsModalVisible(false)}
         onSuccess={groupId => {
           setIsModalVisible(false);
