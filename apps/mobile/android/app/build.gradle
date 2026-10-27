@@ -8,6 +8,7 @@ react {
     reactNativeDir = file("../../../../node_modules/react-native")
     codegenDir = file("../../../../node_modules/@react-native/codegen")
     cliFile = file("../../../../node_modules/react-native/cli.js")
+    hermesCommand = "${file("../../../../node_modules/react-native")}/sdks/hermesc/%OS-BIN%/hermesc"
     autolinkLibrariesWithApp()
 }
 
@@ -48,4 +49,5 @@ android {
 
 dependencies {
     implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:hermes-android")
 }
