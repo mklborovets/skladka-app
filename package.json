@@ -13,11 +13,15 @@
     "emulators": "npm --prefix packages/firebase-backend run emulators",
     "seed": "npm --prefix packages/firebase-backend run seed",
     "test": "npm --prefix packages/firebase-backend test",
-    "typecheck": "npm --prefix apps/mobile run typecheck && npm --prefix packages/firebase-backend run typecheck"
+    "typecheck": "npm --prefix apps/mobile run typecheck && npm --prefix packages/firebase-backend run typecheck",
+    "postinstall": "patch-package"
   },
   "overrides": {
     "jwks-rsa": {
       "jose": "5.9.6"
     }
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.1"
   }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 import firestore from '@react-native-firebase/firestore';
 import { syncExpenseBalance } from '@entities/group';
@@ -18,13 +18,15 @@ export const useOfflineMutationQueue = (
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const isSyncingRef = useRef<boolean>(false);
 
   const processQueue = useCallback(async (): Promise<void> => {
-    if (!userId || isSyncing) {
+    if (!userId || isSyncingRef.current) {
       return;
     }
 
     try {
+      isSyncingRef.current = true;
       setIsSyncing(true);
       setError(null);
 
@@ -63,9 +65,10 @@ export const useOfflineMutationQueue = (
           : 'Failed to process offline mutations';
       setError(message);
     } finally {
+      isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, [userId, isSyncing]);
+  }, [userId]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {

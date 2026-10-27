@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "demo-skladka"
+    "default": "skladka-app-4b787",
+    "demo": "demo-skladka"
   }
 }

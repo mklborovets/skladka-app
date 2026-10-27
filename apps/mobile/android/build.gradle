@@ -1,10 +1,20 @@
+def resolvedNdkVersion = {
+    def sdkDir = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: "${System.getProperty('user.home')}/Library/Android/sdk"
+    if (file("${sdkDir}/ndk/27.1.12297006/source.properties").exists()) {
+        return "27.1.12297006"
+    }
+    return "26.1.10909125"
+}()
+
 buildscript {
+    def sdkDir = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: "${System.getProperty('user.home')}/Library/Android/sdk"
+    def ndkVer = file("${sdkDir}/ndk/27.1.12297006/source.properties").exists() ? "27.1.12297006" : "26.1.10909125"
     ext {
         buildToolsVersion = "35.0.0"
         minSdkVersion = 24
         compileSdkVersion = 35
         targetSdkVersion = 34
-        ndkVersion = "27.1.12297006"
+        ndkVersion = ndkVer
         kotlinVersion = "1.9.24"
     }
     repositories {
@@ -24,7 +34,7 @@ ext {
     minSdkVersion = 24
     compileSdkVersion = 35
     targetSdkVersion = 34
-    ndkVersion = "27.1.12297006"
+    ndkVersion = resolvedNdkVersion
     kotlinVersion = "1.9.24"
 }
 

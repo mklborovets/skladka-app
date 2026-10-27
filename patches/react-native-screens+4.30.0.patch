@@ -1,0 +1,177 @@
+diff --git a/node_modules/react-native-screens/lib/commonjs/components/ScreenContentWrapper.js b/node_modules/react-native-screens/lib/commonjs/components/ScreenContentWrapper.js
+index ddcae83..ddb91d1 100644
+--- a/node_modules/react-native-screens/lib/commonjs/components/ScreenContentWrapper.js
++++ b/node_modules/react-native-screens/lib/commonjs/components/ScreenContentWrapper.js
+@@ -5,11 +5,11 @@ Object.defineProperty(exports, "__esModule", {
+ });
+ exports.default = void 0;
+ var _react = _interopRequireDefault(require("react"));
+-var _ScreenContentWrapperNativeComponent = _interopRequireDefault(require("../fabric/ScreenContentWrapperNativeComponent"));
++var _reactNative = require("react-native");
+ function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+ function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+ function ScreenContentWrapper(props) {
+-  return /*#__PURE__*/_react.default.createElement(_ScreenContentWrapperNativeComponent.default, _extends({
++  return /*#__PURE__*/_react.default.createElement(_reactNative.View, _extends({
+     collapsable: false
+   }, props));
+ }
+diff --git a/node_modules/react-native-screens/lib/commonjs/components/safe-area/SafeAreaView.js b/node_modules/react-native-screens/lib/commonjs/components/safe-area/SafeAreaView.js
+index 8cc31db..7bd98aa 100644
+--- a/node_modules/react-native-screens/lib/commonjs/components/safe-area/SafeAreaView.js
++++ b/node_modules/react-native-screens/lib/commonjs/components/safe-area/SafeAreaView.js
+@@ -13,7 +13,7 @@ var _reactNative = require("react-native");
+ function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+ function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+ function SafeAreaView(props) {
+-  return /*#__PURE__*/_react.default.createElement(_SafeAreaViewNativeComponent.default, _extends({}, props, {
++  return /*#__PURE__*/_react.default.createElement(_reactNative.View, _extends({}, props, {
+     style: [styles.flex, props.style],
+     edges: getNativeEdgesProp(props.edges)
+   }));
+diff --git a/node_modules/react-native-screens/lib/module/components/ScreenContentWrapper.js b/node_modules/react-native-screens/lib/module/components/ScreenContentWrapper.js
+index 2900c08..f964e1c 100644
+--- a/node_modules/react-native-screens/lib/module/components/ScreenContentWrapper.js
++++ b/node_modules/react-native-screens/lib/module/components/ScreenContentWrapper.js
+@@ -1,8 +1,8 @@
+ function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+ import React from 'react';
+-import ScreenContentWrapperNativeComponent from '../fabric/ScreenContentWrapperNativeComponent';
++import { View } from 'react-native';
+ function ScreenContentWrapper(props) {
+-  return /*#__PURE__*/React.createElement(ScreenContentWrapperNativeComponent, _extends({
++  return /*#__PURE__*/React.createElement(View, _extends({
+     collapsable: false
+   }, props));
+ }
+diff --git a/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.js b/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.js
+index 13f09da..3d183f0 100644
+--- a/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.js
++++ b/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.js
+@@ -4,10 +4,9 @@
+ 
+ function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+ import React from 'react';
+-import SafeAreaViewNativeComponent from '../../fabric/safe-area/SafeAreaViewNativeComponent';
+-import { StyleSheet } from 'react-native';
++import { View, StyleSheet } from 'react-native';
+ export function SafeAreaView(props) {
+-  return /*#__PURE__*/React.createElement(SafeAreaViewNativeComponent, _extends({}, props, {
++  return /*#__PURE__*/React.createElement(View, _extends({}, props, {
+     style: [styles.flex, props.style],
+     edges: getNativeEdgesProp(props.edges)
+   }));
+diff --git a/node_modules/react-native-screens/lib/typescript/fabric/FullWindowOverlayNativeComponent.d.ts b/node_modules/react-native-screens/lib/typescript/fabric/FullWindowOverlayNativeComponent.d.ts
+index 25e0fc3..54d6eec 100644
+--- a/node_modules/react-native-screens/lib/typescript/fabric/FullWindowOverlayNativeComponent.d.ts
++++ b/node_modules/react-native-screens/lib/typescript/fabric/FullWindowOverlayNativeComponent.d.ts
+@@ -1,6 +1,6 @@
+ import type { CodegenTypes as CT, HostComponent, ViewProps } from 'react-native';
+ export interface NativeProps extends ViewProps {
+-    accessibilityContainerViewIsModal?: CT.WithDefault<boolean, true>;
++    accessibilityContainerViewIsModal: CT.WithDefault<boolean, true>;
+ }
+ declare const _default: HostComponent<NativeProps>;
+ export default _default;
+diff --git a/node_modules/react-native-screens/src/components/ScreenContentWrapper.tsx b/node_modules/react-native-screens/src/components/ScreenContentWrapper.tsx
+index 95dae06..6dd9bb7 100644
+--- a/node_modules/react-native-screens/src/components/ScreenContentWrapper.tsx
++++ b/node_modules/react-native-screens/src/components/ScreenContentWrapper.tsx
+@@ -1,9 +1,8 @@
+ import React from 'react';
+-import { ViewProps } from 'react-native';
+-import ScreenContentWrapperNativeComponent from '../fabric/ScreenContentWrapperNativeComponent';
++import { ViewProps, View } from 'react-native';
+ 
+ function ScreenContentWrapper(props: ViewProps) {
+-  return <ScreenContentWrapperNativeComponent collapsable={false} {...props} />;
++  return <View collapsable={false} {...props} />;
+ }
+ 
+ export default ScreenContentWrapper;
+diff --git a/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.tsx b/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.tsx
+index a127f0c..436331d 100644
+--- a/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.tsx
++++ b/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.tsx
+@@ -4,17 +4,13 @@
+ 
+ import React from 'react';
+ import { SafeAreaViewProps } from './SafeAreaView.types';
+-import SafeAreaViewNativeComponent, {
+-  NativeProps as SafeAreaViewNativeComponentProps,
+-} from '../../fabric/safe-area/SafeAreaViewNativeComponent';
+-import { StyleSheet } from 'react-native';
++import { StyleSheet, View } from 'react-native';
+ 
+ export function SafeAreaView(props: SafeAreaViewProps) {
+   return (
+-    <SafeAreaViewNativeComponent
++    <View
+       {...props}
+       style={[styles.flex, props.style]}
+-      edges={getNativeEdgesProp(props.edges)}
+     />
+   );
+ }
+diff --git a/node_modules/react-native-screens/src/fabric/FullWindowOverlayNativeComponent.ts b/node_modules/react-native-screens/src/fabric/FullWindowOverlayNativeComponent.ts
+index 4b16d1b..6f9eb9c 100644
+--- a/node_modules/react-native-screens/src/fabric/FullWindowOverlayNativeComponent.ts
++++ b/node_modules/react-native-screens/src/fabric/FullWindowOverlayNativeComponent.ts
+@@ -2,14 +2,13 @@
+ 
+ import { codegenNativeComponent } from 'react-native';
+ import type {
+-  CodegenTypes as CT,
++  WithDefault,
+   HostComponent,
+   ViewProps,
+ } from 'react-native';
+ 
+-// Internal export, not part of stable library API.
+ export interface NativeProps extends ViewProps {
+-  accessibilityContainerViewIsModal?: CT.WithDefault<boolean, true>;
++  accessibilityContainerViewIsModal?: WithDefault<boolean, true>;
+ }
+ 
+ export default codegenNativeComponent<NativeProps>('RNSFullWindowOverlay', {
+diff --git a/node_modules/react-native-screens/src/fabric/ScreenStackHeaderConfigNativeComponent.ts b/node_modules/react-native-screens/src/fabric/ScreenStackHeaderConfigNativeComponent.ts
+index da28c51..f9975ad 100644
+--- a/node_modules/react-native-screens/src/fabric/ScreenStackHeaderConfigNativeComponent.ts
++++ b/node_modules/react-native-screens/src/fabric/ScreenStackHeaderConfigNativeComponent.ts
+@@ -77,8 +77,8 @@ export interface NativeProps extends ViewProps {
+   blurEffect?: CT.WithDefault<BlurEffect, 'none'>;
+   // TODO: implement this props on iOS
+   topInsetEnabled?: boolean | undefined;
+-  headerLeftBarButtonItems?: CT.UnsafeMixed[] | undefined;
+-  headerRightBarButtonItems?: CT.UnsafeMixed[] | undefined;
++  headerLeftBarButtonItems?: CT.UnsafeMixed | undefined;
++  headerRightBarButtonItems?: CT.UnsafeMixed | undefined;
+   onPressHeaderBarButtonItem?:
+     | CT.DirectEventHandler<OnPressHeaderBarButtonItemEvent>
+     | undefined;
+diff --git a/node_modules/react-native-screens/src/fabric/SearchBarNativeComponent.ts b/node_modules/react-native-screens/src/fabric/SearchBarNativeComponent.ts
+index f73aa6f..1ea5959 100644
+--- a/node_modules/react-native-screens/src/fabric/SearchBarNativeComponent.ts
++++ b/node_modules/react-native-screens/src/fabric/SearchBarNativeComponent.ts
+@@ -76,15 +76,15 @@ export interface NativeProps extends ViewProps {
+ type ComponentType = HostComponent<NativeProps>;
+ 
+ interface NativeCommands {
+-  blur: (instance: React.ComponentRef<ComponentType>) => void;
+-  focus: (instance: React.ComponentRef<ComponentType>) => void;
+-  clearText: (instance: React.ComponentRef<ComponentType>) => void;
++  blur: (instance: React.ElementRef<ComponentType>) => void;
++  focus: (instance: React.ElementRef<ComponentType>) => void;
++  clearText: (instance: React.ElementRef<ComponentType>) => void;
+   toggleCancelButton: (
+-    instance: React.ComponentRef<ComponentType>,
++    instance: React.ElementRef<ComponentType>,
+     flag: boolean,
+   ) => void;
+-  setText: (instance: React.ComponentRef<ComponentType>, text: string) => void;
+-  cancelSearch: (instance: React.ComponentRef<ComponentType>) => void;
++  setText: (instance: React.ElementRef<ComponentType>, text: string) => void;
++  cancelSearch: (instance: React.ElementRef<ComponentType>) => void;
+ }
+ 
+ export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({

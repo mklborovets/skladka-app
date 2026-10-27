@@ -18,7 +18,11 @@
   if ([FIRApp defaultApp] == nil) {
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"GoogleService-Info" ofType:@"plist"];
     if (filePath) {
-      [FIRApp configure];
+      @try {
+        [FIRApp configure];
+      } @catch (NSException *exception) {
+        NSLog(@"[Firebase] Configure exception: %@", exception);
+      }
     }
   }
 #endif

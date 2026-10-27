@@ -15,3 +15,5 @@ android/.gradle/
 Steps.md
 local.properties
 *.local.properties
+.cache/
+compile_commands.json

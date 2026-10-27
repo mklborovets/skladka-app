@@ -15,6 +15,7 @@ import {
 import { GroupCard, GroupDoc, useUserGroups } from '@entities/group';
 import { CreateGroupModal } from '@features/create-group';
 import { CreateInviteModal } from '@features/join-by-invite';
+import { ProfileModal } from '@features/auth';
 import { useAuth } from '@app/providers';
 
 export interface GroupsListScreenProps {
@@ -31,9 +32,11 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
   const { user } = useAuth();
   const { groups, isLoading, error } = useUserGroups(user?.uid);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isProfileVisible, setIsProfileVisible] = useState<boolean>(false);
   const [inviteTargetGroup, setInviteTargetGroup] = useState<GroupDoc | null>(
     null
   );
+
 
   if (!user) {
     return null;
@@ -61,14 +64,18 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
               size="sm"
               style={styles.newButton}
             />
-            {onOpenProfile && (
-              <Button
-                title="Profile"
-                onPress={onOpenProfile}
-                variant="ghost"
-                size="sm"
-              />
-            )}
+            <Button
+              title="Profile"
+              onPress={() => {
+                if (onOpenProfile) {
+                  onOpenProfile();
+                } else {
+                  setIsProfileVisible(true);
+                }
+              }}
+              variant="ghost"
+              size="sm"
+            />
           </View>
         }
       />
@@ -119,6 +126,11 @@ export const GroupsListScreen: React.FC<GroupsListScreenProps> = ({
           onClose={() => setInviteTargetGroup(null)}
         />
       )}
+
+      <ProfileModal
+        visible={isProfileVisible}
+        onClose={() => setIsProfileVisible(false)}
+      />
     </ScreenLayout>
   );
 };

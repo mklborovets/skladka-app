@@ -1,4 +1,5 @@
 CompileFlags:
+  CompilationDatabase: "."
   Add:
     - "-isysroot"
     - "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
@@ -6,15 +7,10 @@ CompileFlags:
     - "arm64-apple-ios15.0-simulator"
     - "-fobjc-arc"
     - "-fmodules"
-    - "-fcxx-modules"
+    - "-fno-cxx-modules"
+    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/skladka"
+    - "-I/Users/admin/Desktop/Projects/skladka-app/node_modules/react-native/Libraries/AppDelegate"
+    - "-I/Users/admin/Desktop/Projects/skladka-app/node_modules/react-native/React"
     - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/Yoga"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/React-Core"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/React-RCTAppDelegate"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/ReactCommon"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/RCT-Folly"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/DoubleConversion"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/glog"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/fmt"
     - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/hermes-engine"
-    - "-I/Users/admin/Desktop/Projects/skladka-app/apps/mobile/ios/Pods/Headers/Public/jsi"
+
