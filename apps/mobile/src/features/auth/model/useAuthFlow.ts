@@ -89,10 +89,34 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
       const credential = auth.GoogleAuthProvider.credential(idToken);
       const currentUser = auth().currentUser;
 
-      if (currentUser) {
-        await currentUser.linkWithCredential(credential);
+      if (currentUser && currentUser.isAnonymous) {
+        try {
+          const userCredential = await currentUser.linkWithCredential(credential);
+          await currentUser.reload().catch(() => null);
+          setUser(userCredential.user ?? auth().currentUser);
+        } catch (linkErr: unknown) {
+          const linkErrObj = linkErr as { code?: string; message?: string };
+          if (
+            linkErrObj?.code === 'auth/provider-already-linked' ||
+            linkErrObj?.message?.includes('provider-already-linked')
+          ) {
+            await currentUser.reload().catch(() => null);
+            setUser(auth().currentUser);
+            return;
+          }
+          if (
+            linkErrObj?.code === 'auth/credential-already-in-use' ||
+            linkErrObj?.code === 'auth/email-already-in-use'
+          ) {
+            const userCredential = await auth().signInWithCredential(credential);
+            setUser(userCredential.user ?? auth().currentUser);
+            return;
+          }
+          throw linkErr;
+        }
       } else {
-        await auth().signInWithCredential(credential);
+        const userCredential = await auth().signInWithCredential(credential);
+        setUser(userCredential.user ?? auth().currentUser);
       }
     } catch (err: unknown) {
       const errorObj = err as { code?: string; message?: string };
@@ -106,6 +130,18 @@ export const useAuthFlow = (): UseAuthFlowReturn => {
       }
       if (errorObj?.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         setError('Google Play Services unavailable or outdated');
+        return;
+      }
+      if (
+        errorObj?.code === 'auth/provider-already-linked' ||
+        errorObj?.message?.includes('provider-already-linked')
+      ) {
+        const current = auth().currentUser;
+        if (current) {
+          await current.reload().catch(() => null);
+          setUser(auth().currentUser);
+        }
+        setIsLoading(false);
         return;
       }
       if (

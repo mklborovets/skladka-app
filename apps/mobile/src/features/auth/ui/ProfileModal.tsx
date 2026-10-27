@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Alert,
   Modal,
@@ -20,8 +20,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   visible,
   onClose,
 }) => {
-  const { user, isAnonymous, isLoading, error, linkWithGoogle, signOut } =
+  const { user, isAnonymous, isLoading, error, linkWithGoogle, signOut, clearError } =
     useAuth();
+
+  useEffect(() => {
+    if (visible) {
+      clearError();
+    }
+  }, [visible, clearError]);
 
   if (!user) {
     return null;
